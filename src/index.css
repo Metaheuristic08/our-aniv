@@ -10,6 +10,40 @@
 
 body {
   margin: 0;
+  /* Prevent bounce scrolling on iOS */
+  overscroll-behavior-y: none;
+  /* Prevent text selection on touch devices */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in specific areas */
+p, span, div[contenteditable], input, textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Safe area support for devices with notches */
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-inset-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-inset-right {
+  padding-right: env(safe-area-inset-right);
 }
 
 /* Custom animations */
@@ -35,12 +69,42 @@ body {
   }
 }
 
+@keyframes slide-in-from-bottom-full {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-from-bottom-0 {
+  from {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-in {
   animation: animate-in 0.2s ease-out;
 }
 
 .zoom-in-95 {
   animation: zoom-in-95 0.2s ease-out;
+}
+
+.slide-in-from-bottom-full {
+  animation: slide-in-from-bottom-full 0.3s ease-out;
+}
+
+.slide-in-from-bottom-0 {
+  animation: slide-in-from-bottom-0 0.3s ease-out;
 }
 
 /* Scrollbar hiding utilities */
@@ -76,9 +140,27 @@ body {
   outline-offset: 2px;
 }
 
+/* Touch manipulation for better mobile performance */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
 /* Smooth transitions for theme switching */
 * {
   transition-property: color, background-color, border-color;
   transition-duration: 0.2s;
   transition-timing-function: ease-in-out;
+}
+
+/* Prevent zoom on input focus on iOS */
+input, select, textarea {
+  font-size: 16px;
+}
+
+/* Better tap targets for mobile */
+@media (max-width: 768px) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

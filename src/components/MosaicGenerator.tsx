@@ -63,24 +63,24 @@ const MosaicGenerator: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background-light dark:bg-background-dark">
+    <div className="flex flex-col h-screen bg-background-light dark:bg-background-dark min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
-        <div className="flex items-center justify-between p-4">
-          <Link to="/" className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-content-light dark:text-content-dark">
+      <header className="sticky top-0 z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-subtle-light/20 dark:border-subtle-dark/20">
+        <div className="flex items-center justify-between px-4 py-3 safe-area-inset-top">
+          <Link to="/" className="w-12 h-12 flex items-center justify-center hover:bg-subtle-light dark:hover:bg-subtle-dark rounded-full transition-colors touch-manipulation">
+            <span className="material-symbols-outlined text-content-light dark:text-content-dark text-xl">
               arrow_back
             </span>
           </Link>
-          <h1 className="text-lg font-bold text-center flex-1 text-content-light dark:text-content-dark">
+          <h1 className="text-lg sm:text-xl font-bold text-center flex-1 text-content-light dark:text-content-dark">
             Mosaico de Memorias
           </h1>
           <button 
             onClick={regenerateMosaic}
-            className="w-10 h-10 flex items-center justify-center"
+            className="w-12 h-12 flex items-center justify-center hover:bg-subtle-light dark:hover:bg-subtle-dark rounded-full transition-colors touch-manipulation"
             title="Regenerar mosaico"
           >
-            <span className="material-symbols-outlined text-content-light dark:text-content-dark">
+            <span className="material-symbols-outlined text-content-light dark:text-content-dark text-xl">
               refresh
             </span>
           </button>
@@ -88,36 +88,37 @@ const MosaicGenerator: React.FC = () => {
       </header>
 
       {/* Mosaic Grid */}
-      <main className="flex-grow overflow-y-auto p-4">
-        <div className="grid grid-cols-2 gap-3 max-w-4xl mx-auto">
+      <main className="flex-grow overflow-y-auto px-3 sm:px-4 py-4 safe-area-inset-bottom">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-4xl mx-auto">
           {photos.map((photo, index) => {
-            // Create variety in grid layout
-            const isWide = (index === 2 || index === 7); // Some photos take 2 columns
+            // Create variety in grid layout - less wide cards on mobile
+            const isWide = index === 2 || (index === 7 && window.innerWidth > 640);
             
             return (
               <div
                 key={photo.id}
                 className={`
-                  group relative overflow-hidden rounded-lg shadow-md bg-white dark:bg-subtle-dark/50
-                  transform transition-all duration-300 hover:scale-105 hover:shadow-xl
+                  group relative overflow-hidden rounded-xl shadow-lg bg-white dark:bg-subtle-dark/50
+                  transform transition-all duration-300 active:scale-95 sm:hover:scale-105 sm:hover:shadow-xl
+                  touch-manipulation
                   ${isWide ? 'col-span-2 aspect-[2/1]' : 'aspect-square'}
                 `}
               >
                 {/* Image */}
                 <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-active:scale-110 sm:group-hover:scale-110"
                   style={{ backgroundImage: `url('${photo.imageUrl}')` }}
                 />
                 
                 {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-active:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300" />
                 
                 {/* Content overlay */}
-                <div className="absolute inset-0 p-4 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <p className="text-white font-bold text-sm md:text-base">{photo.title}</p>
-                  <p className="text-white/80 text-xs md:text-sm mt-1 line-clamp-2">{photo.caption}</p>
+                <div className="absolute inset-0 p-3 sm:p-4 flex flex-col justify-end opacity-80 group-active:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                  <p className="text-white font-bold text-sm sm:text-base leading-tight">{photo.title}</p>
+                  <p className="text-white/90 text-xs sm:text-sm mt-1 line-clamp-2 leading-relaxed">{photo.caption}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-white/60 text-xs">{new Date(photo.date).toLocaleDateString()}</span>
+                    <span className="text-white/70 text-xs">{new Date(photo.date).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}</span>
                     {photo.isFavorite && (
                       <span className="material-symbols-outlined text-primary text-sm">favorite</span>
                     )}
@@ -125,8 +126,8 @@ const MosaicGenerator: React.FC = () => {
                 </div>
 
                 {/* Category badge */}
-                <div className="absolute top-2 right-2 px-2 py-1 bg-black/50 rounded-full">
-                  <span className="text-white text-xs capitalize">
+                <div className="absolute top-2 right-2 px-2 py-1 bg-black/50 rounded-lg">
+                  <span className="text-white text-xs capitalize font-medium">
                     {photo.category?.replace('-', ' ')}
                   </span>
                 </div>
@@ -136,19 +137,19 @@ const MosaicGenerator: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4 mt-8 mb-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-8 mb-4 px-4">
           <button
             onClick={regenerateMosaic}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-md"
+            className="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors shadow-lg touch-manipulation font-medium"
           >
-            <span className="material-symbols-outlined">refresh</span>
+            <span className="material-symbols-outlined text-xl">refresh</span>
             Nuevo Mosaico
           </button>
           <Link
             to="/"
-            className="flex items-center gap-2 px-6 py-3 bg-subtle-light dark:bg-subtle-dark text-content-light dark:text-content-dark rounded-lg hover:bg-subtle-light/80 dark:hover:bg-subtle-dark/80 transition-colors shadow-md"
+            className="flex items-center justify-center gap-2 px-6 py-4 bg-subtle-light dark:bg-subtle-dark text-content-light dark:text-content-dark rounded-xl hover:bg-subtle-light/80 dark:hover:bg-subtle-dark/80 transition-colors shadow-lg touch-manipulation font-medium"
           >
-            <span className="material-symbols-outlined">photo_library</span>
+            <span className="material-symbols-outlined text-xl">photo_library</span>
             Ver Album
           </Link>
         </div>

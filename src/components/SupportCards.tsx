@@ -51,33 +51,33 @@ const SupportCards: React.FC = () => {
   }> = ({ card, onClick, index }) => (
     <div 
       className={`
-        p-6 rounded-xl shadow-md cursor-pointer
-        transform transition-all duration-300 hover:scale-105 hover:shadow-lg
-        ${card.color} border-2 border-transparent hover:border-opacity-50
+        p-5 sm:p-6 rounded-xl shadow-lg cursor-pointer
+        transform transition-all duration-300 active:scale-95 sm:hover:scale-102 sm:hover:shadow-xl
+        ${card.color} border-2 border-transparent sm:hover:border-opacity-50 touch-manipulation
       `}
       onClick={onClick}
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0">
-          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-            <span className="material-symbols-outlined text-2xl">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 flex items-center justify-center">
+            <span className="material-symbols-outlined text-2xl sm:text-3xl">
               {card.icon}
             </span>
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-lg mb-2 leading-tight">
+          <h3 className="font-bold text-lg sm:text-xl mb-2 leading-tight">
             {card.title}
           </h3>
-          <p className="text-sm leading-relaxed opacity-90 line-clamp-3">
+          <p className="text-sm sm:text-base leading-relaxed opacity-90 line-clamp-3">
             {card.message}
           </p>
           <div className="mt-3 flex items-center justify-between">
             <span className="text-xs uppercase tracking-wide font-medium opacity-75">
               {card.category}
             </span>
-            <span className="material-symbols-outlined text-sm opacity-60">
+            <span className="material-symbols-outlined text-base opacity-60">
               touch_app
             </span>
           </div>
@@ -94,10 +94,10 @@ const SupportCards: React.FC = () => {
     <button
       onClick={onClick}
       className={`
-        flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
-        transition-all duration-200 whitespace-nowrap
+        flex items-center gap-2 px-4 py-3 rounded-full text-sm font-medium
+        transition-all duration-200 whitespace-nowrap touch-manipulation
         ${isActive 
-          ? 'bg-primary text-white shadow-md' 
+          ? 'bg-primary text-white shadow-lg scale-105' 
           : 'bg-subtle-light dark:bg-subtle-dark text-content-light dark:text-content-dark hover:bg-subtle-light/80 dark:hover:bg-subtle-dark/80'
         }
       `}
@@ -105,34 +105,37 @@ const SupportCards: React.FC = () => {
       <span className="material-symbols-outlined text-lg">
         {category.icon}
       </span>
-      {category.label}
+      <span className="hidden sm:inline">{category.label}</span>
     </button>
   );
 
   const Modal: React.FC<{ card: SupportCard; onClose: () => void }> = ({ card, onClose }) => (
     <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
       onClick={onClose}
     >
       <div 
         className={`
-          max-w-md w-full p-8 rounded-2xl shadow-2xl transform transition-all duration-300
-          ${card.color} animate-in zoom-in-95
+          w-full sm:max-w-md p-6 sm:p-8 rounded-t-3xl sm:rounded-2xl shadow-2xl transform transition-all duration-300
+          ${card.color} animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 safe-area-inset-bottom
         `}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Drag indicator for mobile */}
+        <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-4 sm:hidden"></div>
+        
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
-            <span className="material-symbols-outlined text-3xl">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+            <span className="material-symbols-outlined text-3xl sm:text-4xl">
               {card.icon}
             </span>
           </div>
-          <h2 className="text-2xl font-bold mb-4">{card.title}</h2>
-          <p className="text-lg leading-relaxed mb-6">{card.message}</p>
-          <div className="flex justify-center gap-4">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">{card.title}</h2>
+          <p className="text-lg sm:text-xl leading-relaxed mb-6 sm:mb-8">{card.message}</p>
+          <div className="flex justify-center">
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+              className="px-8 py-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors touch-manipulation font-medium text-lg"
             >
               Cerrar
             </button>
@@ -152,42 +155,42 @@ const SupportCards: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background-light dark:bg-background-dark">
+    <div className="flex flex-col h-screen bg-background-light dark:bg-background-dark min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
-        <div className="flex items-center justify-between p-4">
-          <Link to="/" className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-content-light dark:text-content-dark">
+      <header className="sticky top-0 z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-subtle-light/20 dark:border-subtle-dark/20">
+        <div className="flex items-center justify-between px-4 py-3 safe-area-inset-top">
+          <Link to="/" className="w-12 h-12 flex items-center justify-center hover:bg-subtle-light dark:hover:bg-subtle-dark rounded-full transition-colors touch-manipulation">
+            <span className="material-symbols-outlined text-content-light dark:text-content-dark text-xl">
               arrow_back
             </span>
           </Link>
-          <h1 className="text-lg font-bold text-center flex-1 text-content-light dark:text-content-dark">
+          <h1 className="text-lg sm:text-xl font-bold text-center flex-1 text-content-light dark:text-content-dark">
             Mensajes de Apoyo
           </h1>
-          <div className="w-10"></div>
+          <div className="w-12"></div>
         </div>
       </header>
 
-      <main className="flex-grow overflow-y-auto">
-        <div className="max-w-4xl mx-auto p-4">
+      <main className="flex-grow overflow-y-auto safe-area-inset-bottom">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4">
           {/* Introduction */}
-          <div className="text-center py-6 mb-6">
+          <div className="text-center py-4 sm:py-6 mb-4 sm:mb-6">
             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
               <span className="material-symbols-outlined text-primary text-3xl">
                 favorite
               </span>
             </div>
-            <h2 className="text-2xl font-bold text-content-light dark:text-content-dark mb-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-content-light dark:text-content-dark mb-2">
               Siempre Aquí Para Ti
             </h2>
-            <p className="text-content-light/70 dark:text-content-dark/70 max-w-2xl mx-auto">
+            <p className="text-content-light/70 dark:text-content-dark/70 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed px-4">
               Mensajes diseñados para brindarte calma, motivación y apoyo cuando los necesites. 
               Toca cualquier card para ver el mensaje completo.
             </p>
           </div>
 
           {/* Category Filters */}
-          <div className="flex overflow-x-auto gap-3 pb-4 mb-6 scrollbar-hide">
+          <div className="flex overflow-x-auto gap-2 sm:gap-3 pb-4 mb-4 sm:mb-6 scrollbar-hide px-1">
             {categories.map((category) => (
               <CategoryFilter
                 key={category.id}
@@ -199,7 +202,7 @@ const SupportCards: React.FC = () => {
           </div>
 
           {/* Support Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 gap-4 mb-6 sm:mb-8">
             {filteredCards.map((card, index) => (
               <SupportCardComponent
                 key={card.id}
@@ -223,19 +226,19 @@ const SupportCards: React.FC = () => {
           )}
 
           {/* Navigation */}
-          <div className="flex justify-center gap-4 py-6">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 py-4">
             <Link
               to="/"
-              className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-md"
+              className="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors shadow-lg touch-manipulation font-medium"
             >
-              <span className="material-symbols-outlined">photo_library</span>
+              <span className="material-symbols-outlined text-xl">photo_library</span>
               Ver Fotos
             </Link>
             <Link
               to="/timeline"
-              className="flex items-center gap-2 px-6 py-3 bg-subtle-light dark:bg-subtle-dark text-content-light dark:text-content-dark rounded-lg hover:bg-subtle-light/80 dark:hover:bg-subtle-dark/80 transition-colors shadow-md"
+              className="flex items-center justify-center gap-2 px-6 py-4 bg-subtle-light dark:bg-subtle-dark text-content-light dark:text-content-dark rounded-xl hover:bg-subtle-light/80 dark:hover:bg-subtle-dark/80 transition-colors shadow-lg touch-manipulation font-medium"
             >
-              <span className="material-symbols-outlined">timeline</span>
+              <span className="material-symbols-outlined text-xl">timeline</span>
               Ver Timeline
             </Link>
           </div>
