@@ -23,3 +23,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Capacitor
+android/app/src/main/assets/public
+ios/App/App/public
+ios/App/build
+
+# Optional: Include these if you want to commit the native projects
+# android/
+# ios/
