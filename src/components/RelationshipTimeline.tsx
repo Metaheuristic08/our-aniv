@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { dataService } from '../services/dataService';
+import NavigationFooter from './NavigationFooter.tsx';
 
 const RelationshipTimeline: React.FC = () => {
   const [timeData, setTimeData] = useState({
@@ -239,26 +240,9 @@ const RelationshipTimeline: React.FC = () => {
               - Nuestra historia de amor continúa...
             </p>
           </div>
-
-          {/* Navigation */}
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 py-4">
-            <Link
-              to="/"
-              className="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors shadow-lg touch-manipulation font-medium"
-            >
-              <span className="material-symbols-outlined text-xl">photo_library</span>
-              Ver Fotos
-            </Link>
-            <Link
-              to="/mosaic"
-              className="flex items-center justify-center gap-2 px-6 py-4 bg-subtle-light dark:bg-subtle-dark text-content-light dark:text-content-dark rounded-xl hover:bg-subtle-light/80 dark:hover:bg-subtle-dark/80 transition-colors shadow-lg touch-manipulation font-medium"
-            >
-              <span className="material-symbols-outlined text-xl">grid_view</span>
-              Ver Mosaico
-            </Link>
-          </div>
         </div>
       </main>
+      <NavigationFooter />
     </div>
   );
 };

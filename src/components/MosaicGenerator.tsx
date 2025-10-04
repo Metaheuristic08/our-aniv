@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import type { Photo } from '../config/firebase';
 import { dataService } from '../services/dataService';
+import NavigationFooter from './NavigationFooter.tsx';
 
 const MosaicGenerator: React.FC = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -89,7 +90,7 @@ const MosaicGenerator: React.FC = () => {
 
       {/* Mosaic Grid */}
       <main className="flex-grow overflow-y-auto px-3 sm:px-4 py-4 safe-area-inset-bottom">
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-4xl mx-auto pb-4">
           {photos.map((photo, index) => {
             // Create variety in grid layout - less wide cards on mobile
             const isWide = index === 2 || (index === 7 && window.innerWidth > 640);
@@ -135,25 +136,8 @@ const MosaicGenerator: React.FC = () => {
             );
           })}
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-8 mb-4 px-4">
-          <button
-            onClick={regenerateMosaic}
-            className="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors shadow-lg touch-manipulation font-medium"
-          >
-            <span className="material-symbols-outlined text-xl">refresh</span>
-            Nuevo Mosaico
-          </button>
-          <Link
-            to="/"
-            className="flex items-center justify-center gap-2 px-6 py-4 bg-subtle-light dark:bg-subtle-dark text-content-light dark:text-content-dark rounded-xl hover:bg-subtle-light/80 dark:hover:bg-subtle-dark/80 transition-colors shadow-lg touch-manipulation font-medium"
-          >
-            <span className="material-symbols-outlined text-xl">photo_library</span>
-            Ver Album
-          </Link>
-        </div>
       </main>
+      <NavigationFooter />
     </div>
   );
 };

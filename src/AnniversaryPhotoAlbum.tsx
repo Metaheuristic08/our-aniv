@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import type { Photo } from './config/firebase';
 import { dataService } from './services/dataService';
+import NavigationFooter from './components/NavigationFooter.tsx';
 
 const AnniversaryPhotoAlbum: React.FC = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -153,26 +154,7 @@ const AnniversaryPhotoAlbum: React.FC = () => {
           ))}
         </div>
       </main>
-      <footer className="sticky bottom-0 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-subtle-light/20 dark:border-subtle-dark/20 safe-area-inset-bottom">
-        <nav className="flex justify-around items-center px-2 py-3">
-          <Link className="flex flex-col items-center gap-1 text-primary touch-manipulation min-w-0 flex-1" to="/">
-            <span className="material-symbols-outlined text-xl">photo_library</span>
-            <span className="text-xs font-medium">Photos</span>
-          </Link>
-          <Link className="flex flex-col items-center gap-1 text-content-light/60 dark:text-content-dark/60 hover:text-content-light dark:hover:text-content-dark transition-colors touch-manipulation min-w-0 flex-1" to="/timeline">
-            <span className="material-symbols-outlined text-xl">timeline</span>
-            <span className="text-xs font-medium">Timeline</span>
-          </Link>
-          <Link className="flex flex-col items-center gap-1 text-content-light/60 dark:text-content-dark/60 hover:text-content-light dark:hover:text-content-dark transition-colors touch-manipulation min-w-0 flex-1" to="/mosaic">
-            <span className="material-symbols-outlined text-xl">grid_view</span>
-            <span className="text-xs font-medium">Mosaic</span>
-          </Link>
-          <Link className="flex flex-col items-center gap-1 text-content-light/60 dark:text-content-dark/60 hover:text-content-light dark:hover:text-content-dark transition-colors touch-manipulation min-w-0 flex-1" to="/support">
-            <span className="material-symbols-outlined text-xl">favorite</span>
-            <span className="text-xs font-medium">Support</span>
-          </Link>
-        </nav>
-      </footer>
+      <NavigationFooter />
 
       {/* Add Memory Modal - Mobile optimized */}
       {showAddModal && (

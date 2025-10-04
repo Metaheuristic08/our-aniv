@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import type { SupportCard } from '../config/firebase';
 import { dataService } from '../services/dataService';
+import NavigationFooter from './NavigationFooter.tsx';
 
 const SupportCards: React.FC = () => {
   const [cards, setCards] = useState<SupportCard[]>([]);
@@ -224,26 +225,9 @@ const SupportCards: React.FC = () => {
               </p>
             </div>
           )}
-
-          {/* Navigation */}
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 py-4">
-            <Link
-              to="/"
-              className="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors shadow-lg touch-manipulation font-medium"
-            >
-              <span className="material-symbols-outlined text-xl">photo_library</span>
-              Ver Fotos
-            </Link>
-            <Link
-              to="/timeline"
-              className="flex items-center justify-center gap-2 px-6 py-4 bg-subtle-light dark:bg-subtle-dark text-content-light dark:text-content-dark rounded-xl hover:bg-subtle-light/80 dark:hover:bg-subtle-dark/80 transition-colors shadow-lg touch-manipulation font-medium"
-            >
-              <span className="material-symbols-outlined text-xl">timeline</span>
-              Ver Timeline
-            </Link>
-          </div>
         </div>
       </main>
+      <NavigationFooter />
 
       {/* Modal */}
       {selectedCard && (
