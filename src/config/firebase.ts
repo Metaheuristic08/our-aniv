@@ -1,13 +1,21 @@
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+
 // Firebase configuration
-// TODO: Replace with your actual Firebase config when ready
 export const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
+  apiKey: "AIzaSyDGc7oddD6nad4ga83H4_B5eytEvugJD40",
+  authDomain: "nuestro-aniversario-20866.firebaseapp.com",
+  projectId: "nuestro-aniversario-20866",
+  storageBucket: "nuestro-aniversario-20866.firebasestorage.app",
+  messagingSenderId: "181677768589",
+  appId: "1:181677768589:web:b67b5b7e3f5d9dbe6a87c4"
 };
+
+// Initialize Firebase
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 // For now, we'll use mock data structure
 export interface Photo {

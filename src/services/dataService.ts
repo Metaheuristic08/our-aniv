@@ -1,7 +1,9 @@
 import type { Photo, SupportCard } from '../config/firebase';
+import { photoService, supportCardService } from './firebaseService';
 
-// Mock data service - will be replaced with Firebase calls later
+// Data service with Firebase integration and fallback to mock data
 class DataService {
+  private useFirebase = true; // Set to true to use Firebase
   // Enhanced photos with more metadata
   private photos: Photo[] = [
     {
@@ -166,23 +168,53 @@ class DataService {
 
   // Photo services
   async getPhotos(): Promise<Photo[]> {
+    if (this.useFirebase) {
+      try {
+        return await photoService.getPhotos();
+      } catch (error) {
+        console.error('Firebase error, falling back to mock data:', error);
+        // Fallback to mock data
+      }
+    }
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 100));
     return this.photos;
   }
 
   async getFavoritePhotos(): Promise<Photo[]> {
+    if (this.useFirebase) {
+      try {
+        return await photoService.getFavoritePhotos();
+      } catch (error) {
+        console.error('Firebase error, falling back to mock data:', error);
+      }
+    }
     await new Promise(resolve => setTimeout(resolve, 100));
     return this.photos.filter(photo => photo.isFavorite);
   }
 
   async getRandomPhotos(count: number = 10): Promise<Photo[]> {
+    if (this.useFirebase) {
+      try {
+        return await photoService.getRandomPhotos(count);
+      } catch (error) {
+        console.error('Firebase error, falling back to mock data:', error);
+      }
+    }
     await new Promise(resolve => setTimeout(resolve, 100));
     const shuffled = [...this.photos].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
   }
 
   async toggleFavorite(photoId: string): Promise<void> {
+    if (this.useFirebase) {
+      try {
+        await photoService.toggleFavorite(photoId);
+        return;
+      } catch (error) {
+        console.error('Firebase error, falling back to mock data:', error);
+      }
+    }
     const photo = this.photos.find(p => p.id === photoId);
     if (photo) {
       photo.isFavorite = !photo.isFavorite;
@@ -191,11 +223,25 @@ class DataService {
 
   // Support cards services
   async getSupportCards(): Promise<SupportCard[]> {
+    if (this.useFirebase) {
+      try {
+        return await supportCardService.getSupportCards();
+      } catch (error) {
+        console.error('Firebase error, falling back to mock data:', error);
+      }
+    }
     await new Promise(resolve => setTimeout(resolve, 100));
     return this.supportCards;
   }
 
   async getSupportCardsByCategory(category: SupportCard['category']): Promise<SupportCard[]> {
+    if (this.useFirebase) {
+      try {
+        return await supportCardService.getSupportCardsByCategory(category);
+      } catch (error) {
+        console.error('Firebase error, falling back to mock data:', error);
+      }
+    }
     await new Promise(resolve => setTimeout(resolve, 100));
     return this.supportCards.filter(card => card.category === category);
   }
