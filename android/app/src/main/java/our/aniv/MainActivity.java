@@ -1,4 +1,4 @@
-package my.app;
+package our.aniv;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.ouranniv.app',
-  appName: 'Our Anniversary',
+  appId: 'our.aniv',
+  appName: '🐭❤️😺',
   webDir: 'dist',
   server: {
     androidScheme: 'https'

@@ -32,3 +32,5 @@ ios/App/build
 # Optional: Include these if you want to commit the native projects
 # android/
 # ios/
+
+resources/android/**/*
