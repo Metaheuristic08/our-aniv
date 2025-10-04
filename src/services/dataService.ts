@@ -1,7 +1,10 @@
 import type { Photo, SupportCard } from '../config/firebase';
+import { firebaseService } from './firebaseService';
 
-// Mock data service - will be replaced with Firebase calls later
+// Mock data service - now uses Firebase with fallback to mock data
 class DataService {
+  private useMockData = false; // Toggle to use mock data when Firebase is not available
+
   // Enhanced photos with more metadata
   private photos: Photo[] = [
     {
@@ -166,38 +169,92 @@ class DataService {
 
   // Photo services
   async getPhotos(): Promise<Photo[]> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 100));
-    return this.photos;
+    if (this.useMockData) {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return this.photos;
+    }
+    
+    try {
+      const photos = await firebaseService.getPhotos();
+      return photos.length > 0 ? photos : this.photos; // Fallback to mock if empty
+    } catch (error) {
+      console.error('Error fetching from Firebase, using mock data:', error);
+      return this.photos;
+    }
   }
 
   async getFavoritePhotos(): Promise<Photo[]> {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    return this.photos.filter(photo => photo.isFavorite);
+    if (this.useMockData) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return this.photos.filter(photo => photo.isFavorite);
+    }
+    
+    try {
+      const photos = await firebaseService.getFavoritePhotos();
+      return photos.length > 0 ? photos : this.photos.filter(photo => photo.isFavorite);
+    } catch (error) {
+      console.error('Error fetching from Firebase, using mock data:', error);
+      return this.photos.filter(photo => photo.isFavorite);
+    }
   }
 
   async getRandomPhotos(count: number = 10): Promise<Photo[]> {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    const shuffled = [...this.photos].sort(() => 0.5 - Math.random());
+    const allPhotos = await this.getPhotos();
+    const shuffled = [...allPhotos].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
   }
 
   async toggleFavorite(photoId: string): Promise<void> {
-    const photo = this.photos.find(p => p.id === photoId);
-    if (photo) {
-      photo.isFavorite = !photo.isFavorite;
+    if (this.useMockData) {
+      const photo = this.photos.find(p => p.id === photoId);
+      if (photo) {
+        photo.isFavorite = !photo.isFavorite;
+      }
+      return;
+    }
+    
+    try {
+      await firebaseService.toggleFavorite(photoId);
+    } catch (error) {
+      console.error('Error toggling favorite in Firebase:', error);
+      // Fallback to local
+      const photo = this.photos.find(p => p.id === photoId);
+      if (photo) {
+        photo.isFavorite = !photo.isFavorite;
+      }
     }
   }
 
   // Support cards services
   async getSupportCards(): Promise<SupportCard[]> {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    return this.supportCards;
+    if (this.useMockData) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return this.supportCards;
+    }
+    
+    try {
+      const cards = await firebaseService.getSupportCards();
+      return cards.length > 0 ? cards : this.supportCards;
+    } catch (error) {
+      console.error('Error fetching from Firebase, using mock data:', error);
+      return this.supportCards;
+    }
   }
 
   async getSupportCardsByCategory(category: SupportCard['category']): Promise<SupportCard[]> {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    return this.supportCards.filter(card => card.category === category);
+    if (this.useMockData) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return this.supportCards.filter(card => card.category === category);
+    }
+    
+    try {
+      const cards = await firebaseService.getSupportCardsByCategory(category);
+      return cards.length > 0 ? cards : this.supportCards.filter(card => card.category === category);
+    } catch (error) {
+      console.error('Error fetching from Firebase, using mock data:', error);
+      return this.supportCards.filter(card => card.category === category);
+    }
   }
 
   // Relationship timeline data
@@ -236,6 +293,26 @@ class DataService {
       seconds,
       totalDays
     };
+  }
+
+  // Initialize Firebase database with mock data
+  async initializeFirebaseData(): Promise<void> {
+    try {
+      await firebaseService.initializeDatabase(this.photos, this.supportCards);
+      console.log('Firebase initialized with mock data');
+    } catch (error) {
+      console.error('Error initializing Firebase:', error);
+      throw error;
+    }
+  }
+
+  // Get mock data for reference
+  getMockPhotos(): Photo[] {
+    return [...this.photos];
+  }
+
+  getMockSupportCards(): SupportCard[] {
+    return [...this.supportCards];
   }
 }
 
