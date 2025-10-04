@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router';
 import type { Photo } from '../config/firebase';
 import { dataService } from '../services/dataService';
 import NavigationFooter from './NavigationFooter.tsx';
+import LazyImage from './LazyImage.tsx';
 
 const MosaicGenerator: React.FC = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -26,9 +27,10 @@ const MosaicGenerator: React.FC = () => {
     loadPhotos();
   }, []);
 
-  const regenerateMosaic = async () => {
+  const regenerateMosaic = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const randomPhotos = await dataService.getRandomPhotos(10);
       setPhotos(randomPhotos);
     } catch (err) {
@@ -37,7 +39,7 @@ const MosaicGenerator: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   if (loading) {
     return (
@@ -106,9 +108,10 @@ const MosaicGenerator: React.FC = () => {
                 `}
               >
                 {/* Image */}
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-active:scale-110 sm:group-hover:scale-110"
-                  style={{ backgroundImage: `url('${photo.imageUrl}')` }}
+                <LazyImage
+                  src={photo.imageUrl}
+                  alt={photo.title}
+                  className="absolute inset-0 transition-transform duration-500 group-active:scale-110 sm:group-hover:scale-110"
                 />
                 
                 {/* Gradient overlay */}

@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router';
 import type { Photo } from './config/firebase';
 import { dataService } from './services/dataService';
 import NavigationFooter from './components/NavigationFooter.tsx';
+import LazyImage from './components/LazyImage.tsx';
 
 const AnniversaryPhotoAlbum: React.FC = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -29,15 +30,25 @@ const AnniversaryPhotoAlbum: React.FC = () => {
   const toggleFavorite = async (photoId: string) => {
     try {
       await dataService.toggleFavorite(photoId);
-      // Reload photos to reflect the change
-      const updatedPhotos = await dataService.getPhotos();
-      setPhotos(updatedPhotos);
+      // Update photos state optimistically for better UX
+      setPhotos(prevPhotos => 
+        prevPhotos.map(photo => 
+          photo.id === photoId 
+            ? { ...photo, isFavorite: !photo.isFavorite }
+            : photo
+        )
+      );
     } catch (err) {
       console.error('Error toggling favorite:', err);
+      // Reload photos to sync with server on error
+      const updatedPhotos = await dataService.getPhotos();
+      setPhotos(updatedPhotos);
     }
   };
 
-  const AddMemoryModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
+  // Memoize the AddMemoryModal to prevent re-renders
+  const AddMemoryModal = useMemo(() => 
+    ({ onClose }: { onClose: () => void }) => (
     <div 
       className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
       onClick={onClose}
@@ -79,7 +90,7 @@ const AnniversaryPhotoAlbum: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  ), []);
 
   if (loading) {
     return (
@@ -111,10 +122,11 @@ const AnniversaryPhotoAlbum: React.FC = () => {
           {photos.map((photo) => (
             <div key={photo.id} className="flex-shrink-0 w-[90vw] sm:w-[85vw] max-w-sm snap-center">
               <div className="relative bg-white dark:bg-subtle-dark/50 rounded-xl shadow-lg flex flex-col justify-end overflow-hidden aspect-[9/16] group touch-manipulation">
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-active:scale-105"
-                  style={{ backgroundImage: `url('${photo.imageUrl}')` }}
-                ></div>
+                <LazyImage
+                  src={photo.imageUrl}
+                  alt={photo.title}
+                  className="absolute inset-0 transition-transform duration-700 group-active:scale-105"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                 
                 {/* Favorite Button - Larger for mobile */}
