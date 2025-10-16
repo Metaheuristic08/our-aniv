@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
-import type { SupportCard } from '../config/firebase';
+import type { SupportCard } from '../types';
 import { dataService } from '../services/dataService';
 import NavigationFooter from './NavigationFooter.tsx';
 
@@ -72,7 +72,7 @@ const SupportCards: React.FC = () => {
             {card.title}
           </h3>
           <p className="text-sm sm:text-base leading-relaxed opacity-90 line-clamp-3">
-            {card.message}
+            {card.description}
           </p>
           <div className="mt-3 flex items-center justify-between">
             <span className="text-xs uppercase tracking-wide font-medium opacity-75">
@@ -132,7 +132,7 @@ const SupportCards: React.FC = () => {
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">{card.title}</h2>
-          <p className="text-lg sm:text-xl leading-relaxed mb-6 sm:mb-8">{card.message}</p>
+          <p className="text-lg sm:text-xl leading-relaxed mb-6 sm:mb-8">{card.description}</p>
           <div className="flex justify-center">
             <button
               onClick={onClose}

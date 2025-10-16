@@ -1,74 +1,165 @@
-import type { Photo, SupportCard } from '../config/firebase';
-import { db } from '../config/firebase';
-import { ref, get, set, push, update, remove } from 'firebase/database';
+import type { Photo, SupportCard } from '../types';
 import { userService } from './userService';
 
+// Local data: generate photo list from public/images folder
+const generatePhotosFromLocalImages = (): Photo[] => {
+  const imageFiles = [
+    '2023 11 01.jpg',
+    '2023 11 01 (1).jpg',
+    '2023 11 01 (2).jpg',
+    '2023 11 01 (3).jpg',
+    '2023 11 06.jpg',
+    '2023 12 21.jpg',
+    '2023 12 21 (1).jpg',
+    '2023 12 21 (2).jpg',
+    '2024 01 06.jpg',
+    '2024 01 09.jpg',
+    '2024 01 25.jpg',
+    '2024 01 25 (1).jpg',
+    '2024 01 26.jpg',
+    '2024 01 29.jpg',
+    '2024 02 01.jpg',
+    '2024 02 01 (1).jpg',
+    '2024 02 05.jpg',
+    '2024 02 05 (1).jpg',
+    '2024 02 05 (2).jpg',
+    '2024 02 10.jpg',
+    '2024 02 10 (1).jpg',
+    '2024 02 10 (2).jpg',
+    '2024 02 10 (3).jpg',
+    '2024 02 10 (4).jpg',
+    '2024 02 11.jpg',
+    '2024 02 11 (1).jpg',
+    '2024 02 11 (2).jpg',
+    '2024 02 11 (3).jpg',
+    '2024 02 14.jpg',
+    '2024 02 14 (1).jpg',
+    '2024 02 14 (2).jpg',
+    '2024 02 14 (3).jpg',
+    '2024 02 24.jpg',
+  ];
+
+  return imageFiles.map((filename, index) => {
+    // Extract date from filename "YYYY MM DD.jpg" or "YYYY MM DD (N).jpg"
+    const match = filename.match(/(\d{4}) (\d{2}) (\d{2})/);
+    const dateStr = match ? `${match[1]}-${match[2]}-${match[3]}` : '2023-11-01';
+    
+    // Generate meaningful titles and captions based on dates
+    const photoDate = new Date(dateStr);
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const month = monthNames[photoDate.getMonth()];
+    const day = photoDate.getDate();
+    
+    // Categorize by date
+    let category: Photo['category'] = 'everyday';
+    let title = `${day} de ${month}`;
+    let caption = 'Un momento especial juntos ❤️';
+    
+    if (dateStr === '2023-11-01') {
+      category = 'first-date';
+      title = 'Nuestro Primer Encuentro';
+      caption = 'El día que todo comenzó 💕';
+    } else if (dateStr === '2023-12-21') {
+      category = 'celebration';
+      title = 'Navidad 2023';
+      caption = 'Nuestra primera Navidad juntos 🎄';
+    } else if (dateStr === '2024-02-14') {
+      category = 'celebration';
+      title = 'San Valentín 2024';
+      caption = 'Celebrando nuestro amor 💝';
+    } else if (photoDate.getMonth() === 0 || photoDate.getMonth() === 1) {
+      category = 'milestone';
+      caption = 'Creando memorias inolvidables 🌟';
+    }
+    
+    return {
+      id: `photo-${index + 1}`,
+      imageUrl: `/images/${filename}`,
+      title,
+      caption,
+      date: dateStr,
+      isFavorite: false,
+      category,
+      createdAt: new Date().toISOString(),
+    };
+  });
+};
+
 class DataService {
-  private readonly PHOTOS_PATH = 'photos';
-  private readonly SUPPORT_CARDS_PATH = 'supportCards';
-  private readonly SETTINGS_PATH = 'settings';
+  private photos: Photo[] = generatePhotosFromLocalImages();
+  private readonly FAVORITES_KEY = 'anniversary_favorites';
+  private readonly RELATIONSHIP_START_KEY = 'relationship_start_date';
+
+  constructor() {
+    // Load favorites from localStorage
+    this.loadFavorites();
+  }
+
+  private loadFavorites(): void {
+    try {
+      const favoritesJson = localStorage.getItem(this.FAVORITES_KEY);
+      if (favoritesJson) {
+        const favoriteIds = JSON.parse(favoritesJson) as string[];
+        this.photos = this.photos.map(photo => ({
+          ...photo,
+          isFavorite: favoriteIds.includes(photo.id)
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  }
+
+  private saveFavorites(): void {
+    try {
+      const favoriteIds = this.photos
+        .filter(photo => photo.isFavorite)
+        .map(photo => photo.id);
+      localStorage.setItem(this.FAVORITES_KEY, JSON.stringify(favoriteIds));
+    } catch (error) {
+      console.error('Error saving favorites:', error);
+    }
+  }
 
   async getPhotos(): Promise<Photo[]> {
-    try {
-      const photosRef = ref(db, this.PHOTOS_PATH);
-      const snapshot = await get(photosRef);
-      if (!snapshot.exists()) return [];
-      const photosData = snapshot.val();
-      return Object.keys(photosData).map(key => ({ id: key, ...photosData[key] } as Photo))
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    } catch (error) {
-      console.error('Error getting photos:', error);
-      return [];
-    }
+    // Sort by date descending (newest first)
+    return [...this.photos].sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
   }
 
   async getFavoritePhotos(): Promise<Photo[]> {
-    try {
-      const allPhotos = await this.getPhotos();
-      return allPhotos.filter(photo => photo.isFavorite === true);
-    } catch (error) {
-      console.error('Error getting favorite photos:', error);
-      return [];
-    }
+    const allPhotos = await this.getPhotos();
+    return allPhotos.filter(photo => photo.isFavorite === true);
   }
 
   async getRandomPhotos(count: number = 10): Promise<Photo[]> {
-    try {
-      const allPhotos = await this.getPhotos();
-      const shuffled = [...allPhotos].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count);
-    } catch (error) {
-      console.error('Error getting random photos:', error);
-      return [];
-    }
+    const allPhotos = await this.getPhotos();
+    const shuffled = [...allPhotos].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
   }
 
   async toggleFavorite(photoId: string): Promise<void> {
-    try {
-      const photoRef = ref(db, `${this.PHOTOS_PATH}/${photoId}`);
-      const snapshot = await get(photoRef);
-      if (snapshot.exists()) {
-        const currentFavorite = snapshot.val().isFavorite || false;
-        await update(photoRef, { isFavorite: !currentFavorite });
-      }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      throw error;
+    const photo = this.photos.find(p => p.id === photoId);
+    if (photo) {
+      photo.isFavorite = !photo.isFavorite;
+      this.saveFavorites();
     }
   }
 
   async addPhoto(photo: Omit<Photo, 'id'>): Promise<string> {
-    try {
-      const username = userService.getUsername() || 'Anonymous';
-      const photosRef = ref(db, this.PHOTOS_PATH);
-      const newPhoto = { ...photo, uploadedBy: username, createdAt: new Date().toISOString(), isFavorite: photo.isFavorite || false };
-      const newPhotoRef = push(photosRef);
-      await set(newPhotoRef, newPhoto);
-      return newPhotoRef.key || '';
-    } catch (error) {
-      console.error('Error adding photo:', error);
-      throw error;
-    }
+    const username = userService.getUsername() || 'Anonymous';
+    const newId = `photo-${this.photos.length + 1}`;
+    const newPhoto: Photo = {
+      ...photo,
+      id: newId,
+      uploadedBy: username,
+      createdAt: new Date().toISOString(),
+      isFavorite: photo.isFavorite || false
+    };
+    this.photos.push(newPhoto);
+    return newId;
   }
 
   async convertImageToBase64(file: File): Promise<string> {
@@ -95,66 +186,69 @@ class DataService {
   }
 
   async deletePhoto(photoId: string): Promise<void> {
-    try {
-      const photoRef = ref(db, `${this.PHOTOS_PATH}/${photoId}`);
-      await remove(photoRef);
-    } catch (error) {
-      console.error('Error deleting photo:', error);
-      throw error;
-    }
+    this.photos = this.photos.filter(p => p.id !== photoId);
+    this.saveFavorites();
   }
 
   async updatePhoto(photoId: string, updates: Partial<Photo>): Promise<void> {
-    try {
-      const photoRef = ref(db, `${this.PHOTOS_PATH}/${photoId}`);
-      await update(photoRef, updates);
-    } catch (error) {
-      console.error('Error updating photo:', error);
-      throw error;
+    const photoIndex = this.photos.findIndex(p => p.id === photoId);
+    if (photoIndex !== -1) {
+      this.photos[photoIndex] = { ...this.photos[photoIndex], ...updates };
+      if ('isFavorite' in updates) {
+        this.saveFavorites();
+      }
     }
   }
 
   async getSupportCards(): Promise<SupportCard[]> {
-    try {
-      const cardsRef = ref(db, this.SUPPORT_CARDS_PATH);
-      const snapshot = await get(cardsRef);
-      if (!snapshot.exists()) return [];
-      const cardsData = snapshot.val();
-      return Object.keys(cardsData).map(key => ({ id: key, ...cardsData[key] } as SupportCard));
-    } catch (error) {
-      console.error('Error getting support cards:', error);
-      return [];
-    }
+    // Mock support cards data
+    return [
+      {
+        id: 'card-1',
+        title: 'Te amo',
+        description: 'Cada día contigo es un regalo especial',
+        category: 'love',
+        icon: 'favorite',
+        color: '#ee2b8c',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'card-2',
+        title: 'Siempre juntos',
+        description: 'En las buenas y en las malas, siempre estaré aquí',
+        category: 'support',
+        icon: 'group',
+        color: '#8b5cf6',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'card-3',
+        title: 'Eres increíble',
+        description: 'Tu sonrisa ilumina mis días',
+        category: 'encouragement',
+        icon: 'star',
+        color: '#f59e0b',
+        createdAt: new Date().toISOString(),
+      },
+    ];
   }
 
   async getSupportCardsByCategory(category: SupportCard['category']): Promise<SupportCard[]> {
-    try {
-      const allCards = await this.getSupportCards();
-      return allCards.filter(card => card.category === category);
-    } catch (error) {
-      console.error('Error getting support cards by category:', error);
-      return [];
-    }
+    const allCards = await this.getSupportCards();
+    return allCards.filter(card => card.category === category);
   }
 
-  async addSupportCard(card: Omit<SupportCard, 'id'>): Promise<string> {
-    try {
-      const cardsRef = ref(db, this.SUPPORT_CARDS_PATH);
-      const newCardRef = push(cardsRef);
-      await set(newCardRef, card);
-      return newCardRef.key || '';
-    } catch (error) {
-      console.error('Error adding support card:', error);
-      throw error;
-    }
+  async addSupportCard(_card: Omit<SupportCard, 'id'>): Promise<string> {
+    // In a local implementation, this would be stored in localStorage
+    // For now, just return a mock ID
+    return `card-${Date.now()}`;
   }
 
   async getRelationshipStartDate(): Promise<Date> {
     try {
-      const settingsRef = ref(db, `${this.SETTINGS_PATH}/relationship`);
-      const snapshot = await get(settingsRef);
-      if (snapshot.exists() && snapshot.val().startDate) {
-        return new Date(snapshot.val().startDate);
+      const storedDate = localStorage.getItem(this.RELATIONSHIP_START_KEY);
+      if (storedDate) {
+        return new Date(storedDate);
       }
       return new Date('2023-11-07T00:00:00');
     } catch (error) {
@@ -165,15 +259,22 @@ class DataService {
 
   async setRelationshipStartDate(date: Date): Promise<void> {
     try {
-      const settingsRef = ref(db, `${this.SETTINGS_PATH}/relationship`);
-      await update(settingsRef, { startDate: date.toISOString() });
+      localStorage.setItem(this.RELATIONSHIP_START_KEY, date.toISOString());
     } catch (error) {
       console.error('Error setting relationship start date:', error);
       throw error;
     }
   }
 
-  calculateTimeTogether(startDate?: Date): { years: number; months: number; days: number; hours: number; minutes: number; seconds: number; totalDays: number } {
+  calculateTimeTogether(startDate?: Date): { 
+    years: number; 
+    months: number; 
+    days: number; 
+    hours: number; 
+    minutes: number; 
+    seconds: number; 
+    totalDays: number 
+  } {
     const start = startDate || new Date('2023-11-07T00:00:00');
     const now = new Date();
     const diffMs = now.getTime() - start.getTime();

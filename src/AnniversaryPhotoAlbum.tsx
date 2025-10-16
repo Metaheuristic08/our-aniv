@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
-import type { Photo } from './config/firebase';
+import type { Photo } from './types';
 import { dataService } from './services/dataService';
 import NavigationFooter from './components/NavigationFooter.tsx';
 
