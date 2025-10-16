@@ -1,51 +1,12 @@
 import type { Photo, SupportCard } from '../types';
 import { userService } from './userService';
+import { photoUrls } from '../data/photoUrls';
 
-// Local data: generate photo list from public/images folder
-const generatePhotosFromLocalImages = (): Photo[] => {
-  const imageFiles = [
-    '2023 11 01.jpg',
-    '2023 11 01 (1).jpg',
-    '2023 11 01 (2).jpg',
-    '2023 11 01 (3).jpg',
-    '2023 11 06.jpg',
-    '2023 12 21.jpg',
-    '2023 12 21 (1).jpg',
-    '2023 12 21 (2).jpg',
-    '2024 01 06.jpg',
-    '2024 01 09.jpg',
-    '2024 01 25.jpg',
-    '2024 01 25 (1).jpg',
-    '2024 01 26.jpg',
-    '2024 01 29.jpg',
-    '2024 02 01.jpg',
-    '2024 02 01 (1).jpg',
-    '2024 02 05.jpg',
-    '2024 02 05 (1).jpg',
-    '2024 02 05 (2).jpg',
-    '2024 02 10.jpg',
-    '2024 02 10 (1).jpg',
-    '2024 02 10 (2).jpg',
-    '2024 02 10 (3).jpg',
-    '2024 02 10 (4).jpg',
-    '2024 02 11.jpg',
-    '2024 02 11 (1).jpg',
-    '2024 02 11 (2).jpg',
-    '2024 02 11 (3).jpg',
-    '2024 02 14.jpg',
-    '2024 02 14 (1).jpg',
-    '2024 02 14 (2).jpg',
-    '2024 02 14 (3).jpg',
-    '2024 02 24.jpg',
-  ];
-
-  return imageFiles.map((filename, index) => {
-    // Extract date from filename "YYYY MM DD.jpg" or "YYYY MM DD (N).jpg"
-    const match = filename.match(/(\d{4}) (\d{2}) (\d{2})/);
-    const dateStr = match ? `${match[1]}-${match[2]}-${match[3]}` : '2023-11-01';
-    
-    // Generate meaningful titles and captions based on dates
-    const photoDate = new Date(dateStr);
+// Generate photos from GitHub repository URLs
+const generatePhotosFromGitHub = (): Photo[] => {
+  return photoUrls.map((photoData, index) => {
+    // Parse date from photoData
+    const photoDate = new Date(photoData.date);
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     const month = monthNames[photoDate.getMonth()];
@@ -56,15 +17,15 @@ const generatePhotosFromLocalImages = (): Photo[] => {
     let title = `${day} de ${month}`;
     let caption = 'Un momento especial juntos ❤️';
     
-    if (dateStr === '2023-11-01') {
+    if (photoData.date === '2023-11-01') {
       category = 'first-date';
       title = 'Nuestro Primer Encuentro';
       caption = 'El día que todo comenzó 💕';
-    } else if (dateStr === '2023-12-21') {
+    } else if (photoData.date === '2023-12-21') {
       category = 'celebration';
       title = 'Navidad 2023';
       caption = 'Nuestra primera Navidad juntos 🎄';
-    } else if (dateStr === '2024-02-14') {
+    } else if (photoData.date === '2024-02-14') {
       category = 'celebration';
       title = 'San Valentín 2024';
       caption = 'Celebrando nuestro amor 💝';
@@ -75,10 +36,10 @@ const generatePhotosFromLocalImages = (): Photo[] => {
     
     return {
       id: `photo-${index + 1}`,
-      imageUrl: `/images/${filename}`,
+      imageUrl: photoData.url, // Using GitHub raw content URL
       title,
       caption,
-      date: dateStr,
+      date: photoData.date,
       isFavorite: false,
       category,
       createdAt: new Date().toISOString(),
@@ -87,7 +48,7 @@ const generatePhotosFromLocalImages = (): Photo[] => {
 };
 
 class DataService {
-  private photos: Photo[] = generatePhotosFromLocalImages();
+  private photos: Photo[] = generatePhotosFromGitHub();
   private readonly FAVORITES_KEY = 'anniversary_favorites';
   private readonly RELATIONSHIP_START_KEY = 'relationship_start_date';
 
