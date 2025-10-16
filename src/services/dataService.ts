@@ -17,7 +17,7 @@ const generatePhotosFromGitHub = (): Photo[] => {
     let title = `${day} de ${month}`;
     let caption = 'Un momento especial juntos ❤️';
     
-    if (photoData.date === '2023-11-01') {
+    if (photoData.date === '2023-10-07') {
       category = 'first-date';
       title = 'Nuestro Primer Encuentro';
       caption = 'El día que todo comenzó 💕';
@@ -211,10 +211,10 @@ class DataService {
       if (storedDate) {
         return new Date(storedDate);
       }
-      return new Date('2023-11-07T00:00:00');
+      return new Date('2023-10-07T00:00:00');
     } catch (error) {
       console.error('Error getting relationship start date:', error);
-      return new Date('2023-11-07T00:00:00');
+      return new Date('2023-10-07T00:00:00');
     }
   }
 
@@ -236,7 +236,7 @@ class DataService {
     seconds: number; 
     totalDays: number 
   } {
-    const start = startDate || new Date('2023-11-07T00:00:00');
+    const start = startDate || new Date('2023-10-07T00:00:00');
     const now = new Date();
     const diffMs = now.getTime() - start.getTime();
     const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));

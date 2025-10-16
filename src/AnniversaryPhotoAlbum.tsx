@@ -4,11 +4,13 @@ import { Link } from 'react-router';
 import type { Photo } from './types';
 import { dataService } from './services/dataService';
 import NavigationFooter from './components/NavigationFooter.tsx';
+import ImageModal from './components/ImageModal.tsx';
 
 const AnniversaryPhotoAlbum: React.FC = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   useEffect(() => {
     const loadPhotos = async () => {
@@ -92,15 +94,15 @@ const AnniversaryPhotoAlbum: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen justify-between min-h-screen">
-      <header className="sticky top-0 z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-subtle-light/20 dark:border-subtle-dark/20">
+      <header className="sticky top-0 z-10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-subtle-light/20 dark:border-subtle-dark/20 transition-all duration-300">
         <div className="flex items-center justify-between px-4 py-3 safe-area-inset-top">
           <div className="w-12"></div>
           <h1 className="text-lg sm:text-xl font-bold text-center flex-1 text-content-light dark:text-content-dark">Our Story</h1>
           <button 
-            className="w-12 h-12 flex items-center justify-center hover:bg-subtle-light dark:hover:bg-subtle-dark rounded-full transition-colors touch-manipulation"
+            className="w-12 h-12 flex items-center justify-center hover:bg-subtle-light dark:hover:bg-subtle-dark active:scale-95 rounded-full transition-all duration-200 touch-manipulation"
             onClick={() => setShowAddModal(true)}
           >
-            <span className="material-symbols-outlined text-content-light dark:text-content-dark text-xl">
+            <span className="material-symbols-outlined text-content-light dark:text-content-dark text-xl transition-transform duration-200 hover:rotate-90">
               add_circle
             </span>
           </button>
@@ -110,20 +112,26 @@ const AnniversaryPhotoAlbum: React.FC = () => {
         <div className="h-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide px-3 sm:px-4 gap-3 sm:gap-4 py-4">
           {photos.map((photo) => (
             <div key={photo.id} className="flex-shrink-0 w-[90vw] sm:w-[85vw] max-w-sm snap-center">
-              <div className="relative bg-white dark:bg-subtle-dark/50 rounded-xl shadow-lg flex flex-col justify-end overflow-hidden aspect-[9/16] group touch-manipulation">
+              <div 
+                className="relative bg-white dark:bg-subtle-dark/50 rounded-xl shadow-lg flex flex-col justify-end overflow-hidden aspect-[9/16] group touch-manipulation cursor-pointer transition-all duration-300 hover:shadow-2xl active:scale-98"
+                onClick={() => setSelectedPhoto(photo)}
+              >
                 <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-active:scale-105"
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-active:scale-110 sm:group-hover:scale-105"
                   style={{ backgroundImage: `url('${photo.imageUrl}')` }}
                 ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300"></div>
                 
                 {/* Favorite Button - Larger for mobile */}
                 <button
-                  onClick={() => toggleFavorite(photo.id)}
-                  className="absolute top-3 right-3 w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:bg-black/60 transition-colors touch-manipulation"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(photo.id);
+                  }}
+                  className="absolute top-3 right-3 w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:bg-black/60 active:scale-90 transition-all duration-200 touch-manipulation"
                 >
-                  <span className={`material-symbols-outlined text-2xl ${
-                    photo.isFavorite ? 'text-primary' : 'text-white/80'
+                  <span className={`material-symbols-outlined text-2xl transition-all duration-300 ${
+                    photo.isFavorite ? 'text-primary scale-110' : 'text-white/80 scale-100'
                   }`}>
                     {photo.isFavorite ? 'favorite' : 'favorite_border'}
                   </span>
@@ -159,6 +167,17 @@ const AnniversaryPhotoAlbum: React.FC = () => {
       {/* Add Memory Modal - Mobile optimized */}
       {showAddModal && (
         <AddMemoryModal onClose={() => setShowAddModal(false)} />
+      )}
+
+      {/* Image Modal */}
+      {selectedPhoto && (
+        <ImageModal
+          imageUrl={selectedPhoto.imageUrl}
+          title={selectedPhoto.title}
+          caption={selectedPhoto.caption}
+          date={selectedPhoto.date}
+          onClose={() => setSelectedPhoto(null)}
+        />
       )}
     </div>
   );

@@ -29,27 +29,27 @@ const encodeImageUrl = (filename: string): string => {
 export const photoUrls: PhotoData[] = [
   {
     url: encodeImageUrl('2023 11 01 (1).jpg'),
-    date: '2023-11-01',
+    date: '2023-10-07',
     filename: '2023 11 01 (1).jpg'
   },
   {
     url: encodeImageUrl('2023 11 01 (2).jpg'),
-    date: '2023-11-01',
+    date: '2023-10-07',
     filename: '2023 11 01 (2).jpg'
   },
   {
     url: encodeImageUrl('2023 11 01 (3).jpg'),
-    date: '2023-11-01',
+    date: '2023-10-07',
     filename: '2023 11 01 (3).jpg'
   },
   {
     url: encodeImageUrl('2023 11 01.jpg'),
-    date: '2023-11-01',
+    date: '2023-10-07',
     filename: '2023 11 01.jpg'
   },
   {
     url: encodeImageUrl('2023 11 06.jpg'),
-    date: '2023-11-06',
+    date: '2023-10-07',
     filename: '2023 11 06.jpg'
   },
   {

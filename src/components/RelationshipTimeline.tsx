@@ -150,7 +150,7 @@ const RelationshipTimeline: React.FC = () => {
           {/* Hero Section */}
           <div className="text-center py-4 sm:py-8">
             <h2 className="text-2xl sm:text-3xl font-bold text-content-light dark:text-content-dark mb-2">
-              Desde el 7 de Noviembre, 2023
+              Desde el 7 de Octubre, 2023
             </h2>
             <p className="text-content-light/70 dark:text-content-dark/70 text-base sm:text-lg leading-relaxed">
               Cada segundo cuenta en nuestra historia de amor

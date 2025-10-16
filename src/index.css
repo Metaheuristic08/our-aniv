@@ -58,6 +58,15 @@ p, span, div[contenteditable], input, textarea {
   }
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes zoom-in-95 {
   from {
     opacity: 0;
@@ -91,8 +100,34 @@ p, span, div[contenteditable], input, textarea {
   }
 }
 
+@keyframes slide-in-from-bottom-4 {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-in {
   animation: animate-in 0.2s ease-out;
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease-out;
 }
 
 .zoom-in-95 {
@@ -105,6 +140,19 @@ p, span, div[contenteditable], input, textarea {
 
 .slide-in-from-bottom-0 {
   animation: slide-in-from-bottom-0 0.3s ease-out;
+}
+
+.slide-in-from-bottom-4 {
+  animation: slide-in-from-bottom-4 0.5s ease-out;
+}
+
+/* Utility classes for delays */
+.delay-150 {
+  animation-delay: 150ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
 }
 
 /* Scrollbar hiding utilities */
@@ -143,6 +191,11 @@ p, span, div[contenteditable], input, textarea {
 /* Touch manipulation for better mobile performance */
 .touch-manipulation {
   touch-action: manipulation;
+}
+
+/* Custom scale utilities */
+.active\:scale-98:active {
+  transform: scale(0.98);
 }
 
 /* Smooth transitions for theme switching */
